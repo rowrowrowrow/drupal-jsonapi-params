@@ -1,7 +1,7 @@
 import qs = require('qs');
 
 interface FilterItems {
-  [key: string]: FilterItem | string;
+  [key: string]: FilterItem | string | string[];
 }
 
 interface FilterItem {
@@ -9,7 +9,7 @@ interface FilterItem {
     operator?: string;
     memberOf?: string;
     path: string;
-    value: string;
+    value: string | string[];
   };
   group?: GroupItem;
 }
@@ -80,7 +80,7 @@ export class DrupalJsonApiParams {
     return this;
   }
 
-  public addFilter(path: string, value: string, operator: string = '=', memberOf?: string): DrupalJsonApiParams {
+  public addFilter(path: string, value: string | string[], operator: string = '=', memberOf?: string): DrupalJsonApiParams {
     if (operator === '=' && memberOf === undefined && this.filter[path] === undefined) {
       this.filter[path] = value;
       return this;
