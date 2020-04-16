@@ -64,7 +64,7 @@ test('Add Fields', () => {
 
 test('Add Pager with limit 5', () => {
   let api = new DrupalJsonApiParams();
-  api.addPageLimit(5);
+  api.addPagination({limit:5});
   expect(decodeURIComponent(api.getQueryString())).toBe('page[limit]=5');
 });
 
@@ -101,7 +101,7 @@ test("Nova's Ark", () => {
     // Add Filter to Group.
     .addFilter('status', '2', '!=', 'publish_status')
     // Add Page Limit.
-    .addPageLimit(5)
+    .addPagination({limit:5})
     // Add Fields.
     .addFields('node--article', ['field_a.id', 'field_b.uid', 'field_c.tid'])
     // Add Includes.

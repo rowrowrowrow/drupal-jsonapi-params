@@ -24,7 +24,8 @@ interface GroupItem {
 }
 
 interface PageItem {
-  limit: number;
+  limit?: number;
+  offset?: number;
 }
 
 interface FieldItems {
@@ -56,12 +57,12 @@ export class DrupalJsonApiParams {
     if (direction !== undefined && direction === 'DESC') {
       prefix = '-';
     }
-    this.sort = this.sort.concat(prefix + path);
+    this.sort = this.sort.concat([prefix + path]);
     return this;
   }
 
-  public addPageLimit(limit: number): DrupalJsonApiParams {
-    this.page = { limit };
+  public addPagination(pagination: PageItem): DrupalJsonApiParams {
+    this.page = { ...pagination };
     return this;
   }
 
