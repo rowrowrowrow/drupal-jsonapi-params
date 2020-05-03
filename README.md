@@ -1,21 +1,13 @@
-# Drupal JSON-API Params
-
-[![Build Status](https://travis-ci.org/d34dman/drupal-jsonapi-params.svg?branch=master)](https://travis-ci.org/d34dman/drupal-jsonapi-params)
-[![codecov](https://codecov.io/gh/d34dman/drupal-jsonapi-params/branch/master/graph/badge.svg)](https://codecov.io/gh/d34dman/drupal-jsonapi-params)
-![npm](https://img.shields.io/npm/v/drupal-jsonapi-params)
-![npm bundle size](https://img.shields.io/bundlephobia/minzip/drupal-jsonapi-params)
-![npm type definitions](https://img.shields.io/npm/types/drupal-jsonapi-params)
+# Enhanced Drupal JSON-API Params
 
 enhanced-drupal-jsonapi-params
 ===========
 
-This repo is based on https://github.com/d34dman/drupal-jsonapi-params with added features. Please checkout that repo for more information.
-
-The [JSON:API](https://jsonapi.org/) is now part of [Drupal](https://www.drupal.org/) Core.
+[JSON:API](https://jsonapi.org/) is now part of [Drupal](https://www.drupal.org/) Core.
 
 The JSON:API specifications defines standard query parameters to be used to do filtering, sorting, restricting fields that are returned, pagination and so on.
 
-This module provides a helper Class to create the required query. While doing so, it also tries to optimise the query by using the short form, whenever possible.
+This module provides a helper Class to create and update query params for any Drupal jsonapi request. Please read the following for usage.
 
 ## Installation
 
@@ -30,8 +22,12 @@ $ npm i enhanced-drupal-jsonapi-params
 ### import
 
 Import `DrupalJsonApiParams` from `drupal-jsonapi-params/lib`
+Import `Operators` from `drupal-jsonapi-params/lib/operators`
+Import `Conjunctions` from `drupal-jsonapi-params/lib/conjunctions`
 ```js
-import {DrupalJsonApiParams} from 'drupal-jsonapi-params/lib';
+import {DrupalJsonApiParams} from 'drupal-jsonapi-params/lib'; // Helper class
+import Operators from 'drupal-jsonapi-params/lib/operators'; // Allowed Drupal JSONAPI Operators
+import Conjunctions from 'drupal-jsonapi-params/lib/conjunctions'; // Allowed Drupal JSONAPI Conjunctions
 
 const apiParams = new DrupalJsonApiParams();
 ```
@@ -47,15 +43,27 @@ const apiParams = new drupalJsonapiParams.DrupalJsonApiParams();
 ```js
 apiParams
   // Add Group within Groups.
-  .addGroup('publish_status', 'OR', 'parent_group')
-  .addGroup('child_group_B', 'AND', 'parent_group')
-  .addGroup('parent_group', 'AND')
+  .addGroup(
+    'publish_status',
+    Operators.or, // 'OR'
+    'parent_group')
+  .addGroup(
+    'child_group_B',
+    Operators.and, // 'AND'
+    'parent_group')
+  .addGroup('parent_group', Operators.and)
   // Add Filters.
   .addFilter('status', '1')
   // Add Filter to Group.
-  .addFilter('status', '2', '!=', 'publish_status')
-  // Add Page Limit.
-  .addPageLimit(5)
+  .addFilter(
+    'status', '2',
+    Operators.notEqual, // '<>'
+    'publish_status')
+  // Add Pagination.
+  .addPagination({
+    limit: 5,
+    offset: 0
+  })
   // Add Fields.
   .addFields('node--article', ['field_a.id', 'field_b.uid', 'field_c.tid'])
   // Add Includes.
@@ -64,12 +72,63 @@ apiParams
   .addSort('id', 'DESC')
   .addSort('uid')
   .addSort('status');
+  // OR
+  // Add multiple sort criterion at once ASC for id and uid, DESC for status
+  .addSort('id,uid,-status')
 
 const urlencodedQueryString = apiParams.getQueryString();
 
 ```
 
 ## API
+
+### getQueryObject
+
+Returns query in object form.
+
+### mergeQueryObject
+
+Adds query object to existing query object, also used for instantiating DrupalJsonApiParams with an existing query object.
+```js
+
+const queryObject = {
+  filter: {
+    id: UUID
+  },
+  include: 'some_relationship'
+}
+
+const apiParams = new DrupalJsonApiParams().mergeQueryObject(queryObject);
+
+apiParams
+.addGroup('parent_group', Operators.and)
+.addFilter('status', 1, undefined, 'parent_group')
+
+const newQueryObject = apiParams.getQueryObject();
+
+// newQueryObject
+
+{
+  filter: {
+    id: UUID,
+    parent_group: {
+      group: {
+        conjunction: 'AND'
+      }
+    },
+    status: {
+      condition: {
+        memberOf: "parent_group",
+        operator: "=",
+        path: "status",
+        value: 1
+      }
+    }
+  },
+  include: 'some_relationship'
+}
+
+```
 
 ### getQueryString
 
@@ -87,7 +146,7 @@ Used to restrict items returned in a listing.
 | group    | `string` | (Optional) Name of the group, the filter belongs to
 
 
-Following values can be used for the operator. If none is provided, it assumes "`=`" by default.
+Following values can be used for the operator. If none is provided, it assumes "`=`" by default. All of these are available via the Operators object which is included in this package but not required for use.
 
 ```
   '=', '<>',
@@ -110,6 +169,8 @@ Used to group Filters. Groups can be nested too.
 | conjunction | `string` | (Optional) All groups have conjunctions and a conjunction is either `AND` or `OR`.
 | memberOf    | `string` | (Optional) Name of the group, this group belongs to
 
+All conjunctions are available via the Conjunctions object which is included in this package but not required.
+
 ### addInclude
 
 Used to add referenced resources inside same request. Thereby preventing additional api calls.
@@ -131,19 +192,20 @@ Used to return the list of items in specific order.
 
 [Read more about Sort in Drupal.org Documentation](https://www.drupal.org/docs/8/modules/jsonapi/sorting)
 
-### addPageLimit
+### addPagination
 
 Use to restrict max amount of items returned in the listing. Using this for pagination is tricky, and make sure you read the following document on Drupal.org to implement it correctly.
 
 |Params | Type | Description |
 | ---   | ---  | ---         |
-| limit | `number` | Number of items to limit to |
+| limit | `number` | Number of items to page by |
+| offset | `number` | Desired page |
 
 [Read more about Pagination in Drupal.org Documentation](https://www.drupal.org/docs/8/core/modules/jsonapi-module/pagination)
 
 ### addFields
 
-The name of this method might be miss leading. Use this to explicitely request for specific fields on an entity.
+The name of this method might be miss leading. Use this to explicitly request for specific fields on an entity.
 
 |Params | Type | Description |
 | ---   | ---  | ---         |
