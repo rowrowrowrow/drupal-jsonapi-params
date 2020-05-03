@@ -7,7 +7,7 @@ export const lessThanOrEqual = '<=';
 export const startsWith = 'STARTS_WITH';
 export const contains = 'CONTAINS';
 export const endsWith = 'ENDS_WITH';
-export const in = 'IN';
+export const _in = 'IN';
 export const notIn = 'NOT IN';
 export const between = 'BETWEEN';
 export const notBetween = 'NOT BETWEEN';
