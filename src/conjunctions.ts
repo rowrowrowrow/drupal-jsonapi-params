@@ -1,6 +1,2 @@
-const Conjunctions = {
-  or: 'OR',
-  and: 'AND'
-};
-
-export default Conjunctions;
+export const or = 'OR';
+export const and = 'AND';

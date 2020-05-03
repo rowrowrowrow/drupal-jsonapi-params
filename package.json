@@ -1,6 +1,6 @@
 {
   "name": "enhanced-drupal-jsonapi-params",
-  "version": "1.1.8",
+  "version": "1.1.9",
   "description": "Drupal JSON-API params, Based on https://github.com/d34dman/drupal-jsonapi-params with added features.",
   "author": "rowrowrowrow <darosenbloom@gmail.com>",
   "main": "lib/index.js",

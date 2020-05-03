@@ -26,8 +26,8 @@ Import `Operators` from `drupal-jsonapi-params/lib/operators`
 Import `Conjunctions` from `drupal-jsonapi-params/lib/conjunctions`
 ```js
 import {DrupalJsonApiParams} from 'drupal-jsonapi-params/lib'; // Helper class
-import Operators from 'drupal-jsonapi-params/lib/operators'; // Allowed Drupal JSONAPI Operators
-import Conjunctions from 'drupal-jsonapi-params/lib/conjunctions'; // Allowed Drupal JSONAPI Conjunctions
+import * as Operators from 'drupal-jsonapi-params/lib/operators'; // Allowed Drupal JSONAPI Operators
+import * as Conjunctions from 'drupal-jsonapi-params/lib/conjunctions'; // Allowed Drupal JSONAPI Conjunctions
 
 const apiParams = new DrupalJsonApiParams();
 ```

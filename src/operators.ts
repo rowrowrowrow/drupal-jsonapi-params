@@ -1,19 +1,15 @@
-const Operators = {
-  equal: '=',
-  notEqual:  '<>',
-  greaterThan:  '>',
-  greaterThanOrEqual:  '>=',
-  lessThan:  '<',
-  lessThanOrEqual:  '<=',
-  startsWith:  'STARTS_WITH',
-  contains:  'CONTAINS',
-  endsWith:  'ENDS_WITH',
-  in:  'IN',
-  notIn: 'NOT IN',
-  between: 'BETWEEN',
-  notBetween: 'NOT BETWEEN',
-  isNull: 'IS NULL',
-  isNotNull: 'IS NOT NULL',
-};
-
-export default Operators;
+export const equal = '=';
+export const notEqual = '<>';
+export const greaterThan = '>';
+export const greaterThanOrEqual = '>=';
+export const lessThan = '<';
+export const lessThanOrEqual = '<=';
+export const startsWith = 'STARTS_WITH';
+export const contains = 'CONTAINS';
+export const endsWith = 'ENDS_WITH';
+export const  in=  'IN';
+export const notIn = 'NOT IN';
+export const between = 'BETWEEN';
+export const notBetween = 'NOT BETWEEN';
+export const isNull = 'IS NULL';
+export const isNotNull = 'IS NOT NULL';
